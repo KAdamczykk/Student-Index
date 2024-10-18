@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Management</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        /* Stylowanie głównego kontenera */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #b19cd9;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header .user-info {
+            font-size: 14px;
+        }
+
+        .header .user-info a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .logo-bar {
+            background-color: #4d7be5;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+        .no-underline {
+            text-decoration: none; /* Usunięcie podkreślenia */
+        }
+
+
+
+        .sidebar {
+            background-color: #add8e6;
+            width: 200px;
+            padding-top: 16px;
+            position: relative;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 8px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #87ceeb;
+        }
+
+        .content {
+            margin-left: 210px;
+            padding: 20px;
+            padding-top: 20px;
+            top: 100px;
+            position: absolute;
+
+        }
+        .content h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        /* Stylowanie ikony hamburgera */
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .editBtn{
+            display: inline-block;
+            padding: 10px px;
+            border: none;
+            text-decoration: none;
+            background-color: #e9cb20fa; 
+            color: white; 
+            border-radius: 5px; 
+            width: 60px;
+        }
+        .deleteBtn{
+            display: inline-block;
+            padding: 10px px;
+            border: none;
+            text-decoration: none;
+            background-color: #e13409e8; 
+            color: white; 
+            border-radius: 5px; 
+            width: 60px;
+
+        }
+        .addModelBtn{
+            display: inline-block;
+            padding: 8px 15px;
+            border: none;
+            text-decoration: none;
+            background-color: #4d7be5; 
+            color: white; 
+            border-radius: 5px; 
+            margin-top: 15px; 
+            margin-bottom: 15px;
+        }
+        /* Dla widoków mobilnych */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 14px;
+            }
+
+            .header .user-info {
+                font-size: 12px;
+            }
+
+            .logo-bar h1 {
+                font-size: 18px;
+            }
+
+            .sidebar {
+                    display: none; /* Domyślnie ukryty */
+                    position: fixed; /* Ustawiony na fixed */
+                    width: 100%;
+                    height: auto; /* Możesz ustawić wysokość, jeśli chcesz */
+                    background-color: #add8e6;
+                    top: 60px; /* Ustawiony tuż pod headerem */
+                    left: 0;
+                    z-index: 1000; /* Upewnij się, że sidebar jest nad innymi elementami */
+                }
+
+            .sidebar.active {
+                display: block;
+            }
+
+            .hamburger {
+                display: block;
+                color: white;
+                margin-right: 10px;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Górna sekcja -->
+    <div class="header">
+        <span class="hamburger" onclick="toggleMenu()">&#9776;</span>
+
+        <h1>STUDENT INDEX</h1>
+        <div class="user-info">
+            UŻYTKOWNIK {{user.username}} | <a href="/logout">WYLOGUJ</a>
+        </div>
+    </div>
+
+    <!-- Pasek z logo -->
+    <a href="{% url 'admin_dashboard' %}">
+    <div class="logo-bar">
+        <h1>Tu można umieścić logo uczelni</h1>
+    </div>
+    </a>
+    <!-- Lewa nawigacja -->
+    <div class="sidebar" id="sidebar">
+        <a href="{% url 'register_user' %}">Dodaj użytkownika</a>
+        <a href="{% url 'admins_view' %}">Dodaj admina</a>
+        <a href="{% url 'user_list' %}">Zmiana hasła</a>
+        <a href="{% url 'students_info' %}">Studenci</a>
+        <a href="{% url 'teachers_info' %}">Pracownicy</a>
+        <a href="{% url 'subjects_info' %}">Przedmioty</a>
+        <a href="{% url 'aplications_info' %}">Podania</a>
+        <a href="{% url 'teacher_oceny' %}">Oceny</a>
+        <a href="{% url 'teacher_sprawdziany' %}">Punkty ze sprawdzianów</a>
+        <a href="{% url 'teacher_obecnosc' %}">Nieobecności studentów</a>
+    </div>
+
+    <!-- Główna zawartość -->
+    <div class="content">
+        <h1>Zarządzanie Przedmiotami</h1>
+    
+        <button class="addModelBtn" data-toggle="modal" data-target="#addSubjectModal">Dodaj Przedmiot</button>
+    
+        <table id="subjectsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nazwa Przedmiotu</th>
+                    <th>ECTS</th>
+                    <th>Nauczyciel</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subjects %}
+                <tr data-id="{{ subject.id }}">
+                    <td>{{ subject.id }}</td>
+                    <td class="subject-name">{{ subject.subjectName }}</td>
+                    <td class="subject-ects">{{ subject.ects }}</td>
+                    <td class="subject-teacher" data-teacher-id="{{ subject.teacherId }}">{{ subject.teacherName }} {{ subject.teacherSurname }}</td>
+                    <td>
+                        <button class="editBtn" data-toggle="modal" data-target="#editSubjectModal">Edytuj</button>
+                        <button class="deleteBtn">Usuń</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+<!-- Modal do dodawania przedmiotu -->
+<div class="modal fade" id="addSubjectModal" tabindex="-1" role="dialog" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSubjectModalLabel">Dodaj Przedmiot</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addSubjectForm">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <div class="form-group">
+                        <label for="subjectName">Nazwa Przedmiotu</label>
+                        <input type="text" class="form-control" id="subjectName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ects">ECTS</label>
+                        <input type="number" class="form-control" id="ects" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacher">Nauczyciel</label>
+                        <select class="form-control" id="teacher" required>
+                            <!-- Opcje nauczycieli wypełnią się przez AJAX -->
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Dodaj</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<!-- Modal do edytowania przedmiotu -->
+<div class="modal fade" id="editSubjectModal" tabindex="-1" role="dialog" aria-labelledby="editSubjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editSubjectModalLabel">Edytuj Przedmiot</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editSubjectForm">
+                    <input type="hidden" id="subjectId">
+                    <div class="form-group">
+                        <label for="editSubjectName">Nazwa Przedmiotu</label>
+                        <input type="text" class="form-control" id="editSubjectName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEcts">ECTS</label>
+                        <input type="number" class="form-control" id="editEcts" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTeacher">Nauczyciel</label>
+                        <select class="form-control" id="editTeacher" required>
+                            <!-- Opcje nauczycieli wypełnią się przez AJAX -->
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning">Zaktualizuj</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
+        }
+        $(document).ready(function() {
+            // Ładowanie nauczycieli
+            loadTeachers();
+
+            $('#addSubjectForm').submit(function(event) {
+    event.preventDefault();
+    let subjectName = $('#subjectName').val();
+    let ects = $('#ects').val();
+    let teacherId = $('#teacher').val();
+
+    $.ajax({
+        url: '{% url "add_subject" %}',
+        method: 'POST',
+        data: {
+            'subjectName': subjectName,
+            'ects': ects,
+            'teacherId': teacherId, // Upewnij się, że to 'teacherId'
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            $('#addSubjectModal').modal('hide');
+            location.reload(); // Przeładuj stronę po dodaniu
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error); // Zaloguj błąd
+            alert('Błąd podczas dodawania przedmiotu: ' + xhr.responseText);
+        }
+    });
+});
+
+            // Edytowanie przedmiotu
+$(document).on('click', '.editBtn', function() {
+    let row = $(this).closest('tr');
+    let subjectId = row.data('id');
+    let subjectName = row.find('.subject-name').text();
+    let ects = row.find('.subject-ects').text();
+    let teacherId = row.find('.subject-teacher').data('teacher-id');
+
+    $('#subjectId').val(subjectId);
+    $('#editSubjectName').val(subjectName);
+    $('#editEcts').val(ects);
+    $('#editTeacher').val(teacherId); // Ustawienie nauczyciela w edytowanym przedmiocie
+
+    $('#editSubjectModal').modal('show');
+});
+
+$('#editSubjectForm').submit(function(event) {
+    event.preventDefault();
+    let subjectId = $('#subjectId').val();
+    let subjectName = $('#editSubjectName').val();
+    let ects = $('#editEcts').val();
+    let teacherId = $('#editTeacher').val();
+
+    $.ajax({
+        type: 'POST',
+        url: '{% url "update_subject" %}',
+        data: {
+            'subjectId': subjectId,  // Upewnij się, że nazwa zgadza się
+            'subjectName': subjectName,
+            'ects': ects,
+            'teacherId': teacherId,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            $('#editSubjectModal').modal('hide');
+            location.reload(); // Przeładuj stronę po edytowaniu
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error); // Zaloguj błąd
+            alert('Błąd podczas edytowania przedmiotu: ' + xhr.responseText);
+        }
+    });
+});
+
+            // Usuwanie przedmiotu
+            $(document).on('click', '.deleteBtn', function() {
+                if (confirm('Czy na pewno chcesz usunąć ten przedmiot?')) {
+                    let subjectId = $(this).closest('tr').data('id');
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "delete_subject" %}',
+                        data: {
+                            'id': subjectId,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            location.reload(); // Przeładuj stronę po usunięciu
+                        },
+                        error: function(error) {
+                            alert('Błąd podczas usuwania przedmiotu');
+                        }
+                    });
+                }
+            });
+        });
+
+        function loadTeachers() {
+            $.ajax({
+                url: '{% url "get_teachers" %}', // Zaktualizuj ten adres URL, jeśli jest inny
+                method: 'GET',
+                success: function(data) {
+                    // Przykładowa struktura danych:
+                    // [{"id":1,"name":"Jan","surname":"Kowalski"},{"id":2,"name":"Anna","surname":"Nowak"}]
+                    data.forEach(function(teacher) {
+                        $('#teacher').append(new Option(teacher.name + ' ' + teacher.surname, teacher.id));
+                        $('#editTeacher').append(new Option(teacher.name + ' ' + teacher.surname, teacher.id));
+                    });
+                },
+                error: function(error) {
+                    alert('Błąd podczas ładowania nauczycieli');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

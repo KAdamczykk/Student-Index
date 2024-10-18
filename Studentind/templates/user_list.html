@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>applications info</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        /* Stylowanie głównego kontenera */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .modal {
+            display: none; /* Ukryty, gdy nieaktywny */
+            position: fixed;
+            z-index: 1050; /* Wyższy z-index, aby modal był na wierzchu */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.5); /* Tło za modalem */
+        }
+
+        /* Styl dla okna modala */
+        .modal-content {
+            background-color: #fff; /* Jasne tło */
+            margin: 5% auto; /* Wyśrodkowanie okna */
+            padding: 20px; /* Wewnętrzne odstępy */
+            border-radius: 5px; /* Zaokrąglenie rogów */
+            width: 50%; /* Szerokość modala */
+            max-width: 600px; /* Maksymalna szerokość */
+            box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5); /* Cień wokół okna */
+        }
+
+        /* Stylowanie nagłówka, przycisku zamknięcia */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        .modal-body .form-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-body label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.modal-body input {
+    flex: 2;
+}
+
+        .close {
+            color: #aaa;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        /* Stylowanie górnego paska (header) */
+        .header {
+            background-color: #b19cd9;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header .user-info {
+            font-size: 14px;
+        }
+
+        .header .user-info a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .student-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .student-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Pasek z logo umieszczony pod headerem */
+        .logo-bar {
+            background-color: #4d7be5;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+
+        .no-underline {
+            text-decoration: none; /* Usunięcie podkreślenia */
+        }
+
+        /* Nawigacja po lewej stronie */
+        .sidebar {
+            background-color: #add8e6;
+            width: 200px;
+            padding-top: 20px;
+            position: relative;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #87ceeb;
+        }
+
+        .sidebar .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Główna zawartość strony */
+        .content {
+            margin-left: 210px;
+            padding: 20px;
+            top: 100px;
+            position: absolute;
+        }
+
+        .content h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+
+
+
+        .filters {
+            width: 50%;
+            height: 30px;
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 14px;
+            }
+            .header .user-info {
+                font-size: 12px;
+            }
+            .logo-bar h1 {
+                font-size: 18px;
+            }
+            .sidebar {
+                display: none; /* Domyślnie ukryty */
+                position: fixed; /* Ustawiony na fixed */
+                width: 100%;
+                height: auto; /* Możesz ustawić wysokość, jeśli chcesz */
+                background-color: #add8e6;
+                top: 60px; /* Ustawiony tuż pod headerem */
+                left: 0;
+                z-index: 1000; /* Upewnij się, że sidebar jest nad innymi elementami */
+            }
+            .sidebar.active {
+                display: block;
+            }
+            .hamburger {
+                display: block;
+                color: white;
+                margin-right: 10px;
+            }
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Górna sekcja -->
+    <div class="header">
+        <span class="hamburger" onclick="toggleMenu()">&#9776;</span>
+        <h1>STUDENT INDEX</h1>
+        <div class="user-info">
+            UŻYTKOWNIK 
+            {{ user.username }} | <a href="/logout">WYLOGUJ</a>
+        </div>
+    </div>
+
+    <!-- Pasek z logo -->
+    <a href="{% url 'admin_dashboard' %}">
+        <div class="logo-bar">
+            <h1>Tu można umieścić logo uczelni</h1>
+        </div>
+        </a>
+
+
+    <!-- Lewa nawigacja -->
+    <div class="sidebar" id="sidebar">
+        <a href="{% url 'register_user' %}">Dodaj użytkownika</a>
+        <a href="{% url 'admins_view' %}">Dodaj admina</a>
+        <a href="{% url 'user_list' %}">Zmiana hasła</a>
+        <a href="{% url 'students_info' %}">Studenci</a>
+        <a href="{% url 'teachers_info' %}">Pracownicy</a>
+        <a href="{% url 'subjects_info' %}">Przedmioty</a>
+        <a href="{% url 'aplications_info' %}">Podania</a>
+        <a href="{% url 'teacher_oceny' %}">Oceny</a>
+        <a href="{% url 'teacher_sprawdziany' %}">Punkty ze sprawdzianów</a>
+        <a href="{% url 'teacher_obecnosc' %}">Nieobecności studentów</a>
+    </div>
+
+    <!-- Główna zawartość -->
+    <div class="content">
+        <h1>Lista użytkowników</h1>
+
+        <input type="text" id="userSearch" class= "filters" placeholder="Wyszukaj użytkowników...">
+
+        <table id="user-table">
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>Email</th>
+                    <th>Rola</th>
+                    <th>Akcja</th>
+                </tr>
+            </thead>
+            <tbody id="userBody">
+                <!-- Tutaj będą dodawane wiersze użytkowników -->
+            </tbody>
+        </table>
+
+        <!-- Modal do zmiany hasła -->
+        <!-- Modal do zmiany hasła -->
+
+        <!-- Modal for changing password -->
+        <div id="change-password-modal" class="modal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Zmień hasło</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="change-password-form">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <div class="form-group">
+                            <label for="new-password">Nowe hasło:</label>
+                            <input type="password" id="new-password" name="new_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Potwierdź nowe hasło:</label>
+                            <input type="password" id="confirm-password" name="confirm_password" required>
+                        </div>
+                        <input type="hidden" id="user_id" name="user_id"> <!-- Hidden input for user ID -->
+                        <button type="submit" class="btn btn-primary">Zaktualizuj</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+
+            // Funkcja do toggle sidebar
+            function toggleMenu() {
+                $('#sidebar').toggleClass('active'); // Dodaj klasę aktywną
+            }
+
+            function loadUsers() {
+                let username = $('#userSearch').val();
+                $.ajax({
+                    url: '{% url "filter_user_list" %}', // Adjust this URL to match your actual URL
+                    data: {
+                        'index': username,
+                    },
+                    success: function(data) {
+                        $('#userBody').empty();
+                        if (data.applications.length > 0) {
+                            $.each(data.applications, function(index, user) {
+                                $('#userBody').append(`
+                                    <tr>
+                                        <td>${user.index}</td>
+                                        <td>${user.email}</td>
+                                        <td>${user.role}</td>
+                                        <td>
+                                            <button class="changeBtn" data-id="${user.id}" data-toggle="modal" data-target="#change-password-modal">Zmień hasło</button>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        } else {
+                            $('#userBody').append(`
+                                <tr>
+                                    <td colspan="4">Brak użytkowników do wyświetlenia.</td>
+                                </tr>
+                            `);
+                        }
+                    },
+                    error: function() {
+                        alert('Błąd podczas ładowania użytkowników.');
+                    }
+                });
+            }
+
+            $(document).ready(function() {
+                loadUsers();
+
+                $('#userSearch').on('input', loadUsers); // Live search
+
+                // Handle change password button click
+                $('#userBody').on('click', '.changeBtn', function() {
+                    const userId = $(this).data('id'); // Get user ID
+                    $('#user_id').val(userId); // Set the hidden input value
+                });
+
+                // Handle password change form submission
+                $('#change-password-form').submit(function(event) {
+                    event.preventDefault();
+                    const userId = $('#user_id').val(); // Get user ID from the hidden input
+                    const newPassword = $('#new-password').val();
+                    const confirmPassword = $('#confirm-password').val();
+
+                    // Validate passwords match
+                    if (newPassword !== confirmPassword) {
+                        alert('Hasła nie pasują!');
+                        return;
+                    }
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/change-password/' + userId + '/',  // This should match the URL pattern
+                        data: {
+                            'new_password': newPassword,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}' // Ensure this is correctly set
+                        },
+                        success: function(response) {
+                            $('#change-password-modal').modal('hide');
+                            loadUsers(); // Reload users to reflect changes
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                            alert('Błąd podczas zmiany hasła: ' + xhr.responseText);
+                        }
+                    });
+                });
+            });
+
+                // Wywołanie funkcji po załadowaniu strony
+
+               
+        $('#userSearch').on('input', loadUsers);  
+        $(document).ready(function() {
+            loadUsers();
+        });
+
+           
+        </script>
+    </div>
+</body>
+</html>

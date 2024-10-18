@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>applications info</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #b19cd9;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .header .user-info {
+            font-size: 14px;
+        }
+        .header .user-info a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .logo-bar {
+            background-color: #4d7be5;
+            padding: 10px;
+            text-align: center;
+        }
+        .logo-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+        .no-underline {
+            text-decoration: none;
+        }
+        .sidebar {
+            background-color: #add8e6;
+            width: 200px;
+            padding-top: 20px;
+            position: relative;
+            height: 100vh;
+        }
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+        .sidebar a:hover {
+            background-color: #87ceeb;
+        }
+        .sidebar .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .content {
+            margin-left: 210px;
+            padding: 20px;
+            padding-top: 20px;
+            top: 100px;
+            position: absolute;
+        }
+        .content h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .delete-Btn, .status-select, .change-status {
+            display: inline-block; /* Elementy obok siebie */
+            padding: 10px; /* Wcięcie wewnętrzne */
+            border: none;
+            text-decoration: none;
+            border-radius: 5px;
+            width: 75px; /* Ta sama szerokość */
+            height: 40px; 
+            vertical-align: top; 
+        }
+
+        /* Specyficzne style dla każdego z elementów */
+        .delete-Btn {
+            background-color: #e13409e8; 
+            color: white;
+        }
+
+        .status-select {
+            background-color: lightgray; /* Dodaj kolor tła, aby był widoczny */
+        }
+
+        .change-status {
+            background-color: #4CAF50; /* Dodaj kolor tła dla zmiany statusu */
+            color: white;
+        }
+        .filters {
+            width: 120px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 14px;
+            }
+            .header .user-info {
+                font-size: 12px;
+            }
+            .logo-bar h1 {
+                font-size: 18px;
+            }
+            .sidebar {
+                    display: none; /* Domyślnie ukryty */
+                    position: fixed; /* Ustawiony na fixed */
+                    width: 100%;
+                    height: auto; /* Możesz ustawić wysokość, jeśli chcesz */
+                    background-color: #add8e6;
+                    top: 60px; 
+                    left: 0;
+                    z-index: 1000; 
+                }
+            .sidebar.active {
+                display: block;
+            }
+            .hamburger {
+                display: block;
+                color: white;
+                margin-right: 10px;
+            }
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Górna sekcja -->
+    <div class="header">
+        <span class="hamburger" onclick="toggleMenu()">&#9776;</span>
+        <h1>STUDENT INDEX</h1>
+        <div class="user-info">
+            UŻYTKOWNIK 
+            {{ user.username }} | <a href="/logout">WYLOGUJ</a>
+        </div>
+    </div>
+
+    <!-- Pasek z logo -->
+    <div class="logo-bar">
+        <h1>LOGO (Tu umieścisz logo w przyszłości)</h1>
+    </div>
+
+   <!-- Lewa nawigacja -->
+   <div class="sidebar" id="sidebar">
+        <a href="{% url 'register_user' %}">Dodaj użytkownika</a>
+        <a href="{% url 'admins_view' %}">Dodaj admina</a>
+        <a href="{% url 'user_list' %}">Zmiana hasła</a>
+        <a href="{% url 'students_info' %}">Studenci</a>
+        <a href="{% url 'teachers_info' %}">Pracownicy</a>
+        <a href="{% url 'subjects_info' %}">Przedmioty</a>
+        <a href="{% url 'aplications_info' %}">Podania</a>
+        <a href="{% url 'teacher_oceny' %}">Oceny</a>
+        <a href="{% url 'teacher_sprawdziany' %}">Punkty ze sprawdzianów</a>
+        <a href="{% url 'teacher_obecnosc' %}">Nieobecności studentów</a>
+    </div>
+
+    <!-- Główna zawartość -->
+    <div class="content">
+        <h1>Informacje o podaniach</h1>
+
+        <!-- Wyszukiwanie -->
+        <div>
+            <label for="surname">Filtruj po nazwisku:</label>
+            <input type="text" id="surname" class="filters" placeholder="Enter surname">
+            
+            <label for="index">Filtruj po indexie:</label>
+            <input type="text" id="index" class="filters" placeholder="Enter student index">
+        </div>
+        
+        <!-- Tabela wyników -->
+        <table>
+            <colgroup>
+                <col style="width: 12%;"> 
+                <col style="width: 12%;">
+                <col style="width: 10%;"> 
+                <col style="width: 32%;"> 
+                <col style="width: 12%;">
+                <col style="width: 12%;"> 
+                <col style="width: 12%;"> 
+                <col style="width: 32%;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Imię</th>
+                    <th>Nazwisko</th>
+                    <th>Index</th>
+                    <th>Text</th>
+                    <th>Status</th>
+                    <th>Typ</th>
+                    <th>Data Złożenia</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody id="applications-table-body">
+                {% for application in applications %}
+                <tr id="application-{{ application.id }}">
+                    <td>{{ application.student_name }}</td>
+                    <td>{{ application.student_surname }}</td>
+                    <td>{{ application.studentIndex }}</td>
+                    <td>{{ application.text }}</td>
+                    <td class="status">{{ application.status }}</td>
+                    <td>{{ application.type }}</td>
+                    <td>{{ application.date_added }}</td>
+
+                    <td>
+                        <!-- Formularz do zmiany statusu -->
+                        <select class="status-select" data-id="{{ application.id }}">
+                            <option value="In progress" {% if application.status == 'In progress' %}selected{% endif %}>In progress</option>
+                            <option value="Accepted" {% if application.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+                            <option value="Rejected" {% if application.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                        <button class="change-status" data-id="{{ application.id }}">Change Status</button>
+                        <button class="delete-Btn" data-id="{{ application.id }}">Usuń</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">No applications found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
+        }
+
+        $(document).ready(function() {
+    // Zmiana statusu
+    $('.change-status').on('click', function() {
+        var row = $(this).closest('tr'); 
+        var applicationId = $(this).siblings('.status-select').data('id'); // Pobiera data-id z select
+        var newStatus = $(this).siblings('.status-select').val(); // Pobiera wartość wybraną w select
+
+        console.log('ID aplikacji:', applicationId);
+
+        $.ajax({
+            url: "{% url 'change_application_status' %}",  
+            method: 'POST',
+            data: {
+                'applicationId': applicationId,
+                'newStatus': newStatus,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert('Status zmieniony pomyślnie!');
+                    row.find('.status').text(newStatus); // Aktualizuje status w widoku
+                } else {
+                    alert('Błąd zmiany statusu: ' + response.message); // Obsługa błędu zwróconego z serwera
+                }
+            },
+            error: function(xhr) {
+                alert('Błąd zmiany statusu: ' + xhr.responseText);
+            }
+        });
+    });
+
+
+            // Usuwanie podania
+            $(document).on('click', '.delete-Btn', function() {
+                let applicationId = $(this).data('id');
+                if (confirm('Czy na pewno chcesz usunąć tą aplikację?')) {
+                    $.ajax({
+                        url: '{% url "delete_applications" %}',
+                        method: 'POST',
+                        data: {
+                            'applicationId': applicationId,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        },
+                        success: function(response) {
+                            alert('Podanie usunięte pomyślnie!');
+                            $('#application-' + applicationId).remove(); // Usuwa wiersz aplikacji z tabeli
+                        },
+                        error: function(xhr) {
+                            alert('Błąd podczas usuwania podania: ' + xhr.responseText);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

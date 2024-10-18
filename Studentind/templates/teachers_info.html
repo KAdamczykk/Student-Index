@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher info</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        /* Stylowanie głównego kontenera */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Stylowanie górnego paska (header) */
+        .header {
+            background-color: #b19cd9;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .header .user-info {
+            font-size: 14px;
+        }
+
+        .header .user-info a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .logo-bar {
+            background-color: #4d7be5;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+        .no-underline {
+            text-decoration: none; /* Usunięcie podkreślenia */
+        }
+
+        /* Nawigacja po lewej stronie */
+
+        .sidebar {
+            background-color: #add8e6;
+            width: 200px;
+            padding-top: 20px;
+            position: relative;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #87ceeb;
+        }
+
+        .sidebar .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .content {
+            margin-left: 210px;
+            padding: 20px;
+            padding-top: 20px;
+            top: 100px;
+            position: absolute;
+
+        }
+        .content h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+
+
+        /* Stylowanie ikony hamburgera */
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .editable{
+            width: 65px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .saveBtn{
+            display: inline-block;
+            padding: 10px px;
+            border: none;
+            text-decoration: none;
+            background-color: #06bd21e8; 
+            color: white; 
+            border-radius: 5px; 
+            width: 60px;
+        }
+        .cancelBtn{
+            display: inline-block;
+            padding: 10px px;
+            border: none;
+            text-decoration: none;
+            background-color: #6462e9e8; 
+            color: white; 
+            border-radius: 5px; 
+            width: 60px;
+        }
+        .delete-Btn{
+            display: inline-block;
+            padding: 10px px;
+            border: none;
+            text-decoration: none;
+            background-color: #e13409e8; 
+            color: white; 
+            border-radius: 5px; 
+            width: 60px;
+        }
+        .sorts{
+            display: inline-block;
+            padding: 10px px;
+            text-decoration: none;
+            border-radius: 5px; 
+            width: 120px; 
+            margin-top: 20px;
+            margin-bottom: 10px;
+
+        }
+        .filters{
+            width: 120px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        /* Dla widoków mobilnych */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 14px;
+            }
+
+            .header .user-info {
+                font-size: 12px;
+            }
+
+            .logo-bar h1 {
+                font-size: 18px;
+            }
+
+            .sidebar {
+                    display: none; /* Domyślnie ukryty */
+                    position: fixed; /* Ustawiony na fixed */
+                    width: 100%;
+                    height: auto; /* Możesz ustawić wysokość, jeśli chcesz */
+                    background-color: #add8e6;
+                    top: 60px; /* Ustawiony tuż pod headerem */
+                    left: 0;
+                    z-index: 1000; /* Upewnij się, że sidebar jest nad innymi elementami */
+                }
+
+            .sidebar.active {
+                display: block;
+            }
+
+            .hamburger {
+                display: block;
+                color: white;
+                margin-right: 10px;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Górna sekcja -->
+    <div class="header">
+        <span class="hamburger" onclick="toggleMenu()">&#9776;</span>
+        <h1>STUDENT INDEX</h1>
+        <div class="user-info">
+            UŻYTKOWNIK 
+            
+            {{user.username}} | <a href="/logout">WYLOGUJ</a>
+
+        </div>
+    </div>
+
+    <!-- Pasek z logo -->
+    <a href="{% url 'admin_dashboard' %}">
+        <div class="logo-bar">
+            <h1>Tu można umieścić logo uczelni</h1>
+        </div>
+        </a>
+
+   <!-- Lewa nawigacja -->
+   <div class="sidebar" id="sidebar">
+        <a href="{% url 'register_user' %}">Dodaj użytkownika</a>
+        <a href="{% url 'admins_view' %}">Dodaj admina</a>
+        <a href="{% url 'user_list' %}">Zmiana hasła</a>
+        <a href="{% url 'students_info' %}">Studenci</a>
+        <a href="{% url 'teachers_info' %}">Pracownicy</a>
+        <a href="{% url 'subjects_info' %}">Przedmioty</a>
+        <a href="{% url 'aplications_info' %}">Podania</a>
+        <a href="{% url 'teacher_oceny' %}">Oceny</a>
+        <a href="{% url 'teacher_sprawdziany' %}">Punkty ze sprawdzianów</a>
+        <a href="{% url 'teacher_obecnosc' %}">Nieobecności studentów</a>
+
+</div>
+
+    <!-- Główna zawartość -->
+    <div class="content">
+        <h1>Informacje o pracownikach</h1>
+
+        <!-- Wyszukiwanie -->
+        <div>
+            <label for="surnameFilter" >Szukaj po nazwisku:</label>
+            <input type="text" id="surnameFilter" class="filters" placeholder="Enter surname...">
+            
+            <label for="indexFilter">Szukaj po indexie:</label>
+            <input type="text" id="indexFilter" class="filters" placeholder="Enter student index...">
+            
+            <label for="sortOrder">Sortuj alfabetycznie:</label>
+            <select id="sortOrder" class="sorts">
+                <option value="asc">Rosnąco</option>
+                <option value="desc">Malejąco</option>
+            </select>
+    
+        </div>
+    <!-- Tabela wyników -->
+    <table border="1" id="teachersTable">
+        <thead>
+            <tr>
+                <th>Imie</th>
+                <th>Nazwisko</th>
+                <th>Index</th>
+                <th>Email</th>
+                <th>Pesel</th>
+                <th>Nr tel</th>
+                <th>Miasto</th>
+                <th>Ulica</th>
+                <th>Nr domu</th>
+                <th>Nr flat</th>
+                <th>Akcje</th>
+
+            </tr>
+        </thead>
+        <tbody id="teachersBody">
+            
+        </tbody>
+    </table>
+    </table>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
+        }
+        let sortBy = 'surname'; // Domyślne sortowanie po nazwisku
+        let sortOrder = 'asc';  // Domyślna kolejność sortowania
+        function fetchTeachers() {
+            let surnameFilter = $('#surnameFilter').val();  // Filtrowanie po nazwisku
+            let indexFilter = $('#indexFilter').val();
+            let sortOrder = $('#sortOrder').val();  // Kolejność sortowania (rosnąco/malejąco)
+            $.ajax({
+                url: '{% url "filter_teachers_info" %}',  
+                data: {
+                        'surnameFilter': surnameFilter,  
+                        'indexFilter': indexFilter,  
+                        'sort_by': sortBy,        
+                        'sort_order': sortOrder     
+                },
+                success: function(data) {
+                    $('#teachersBody').empty();
+
+                    if (data.teachers.length > 0) {
+                        $.each(data.teachers, function(index, teacher) {
+                            $('#teachersBody').append(`
+                                <tr data-id="${teacher.id}">
+                                    <td><input type="text" class="editable" value="${teacher.name}" name="name"></td>
+                                    <td><input type="text" class="editable" value="${teacher.surname}" name="surname"></td>
+                                    <td><input type="text" class="editable" value="${teacher.index}" name="index"></td>
+                                    <td><input type="text" class="editable" value="${teacher.email}" name="email"></td>
+                                    <td><input type="text" class="editable" value="${teacher.pesel}" name="pesel"></td>
+                                    <td><input type="text" class="editable" value="${teacher.phone_nr}" name="phone_nr"></td>
+                                    <td><input type="text" class="editable" value="${teacher.city}" name="city"></td>
+                                    <td><input type="text" class="editable" value="${teacher.street}" name="street"></td>
+                                    <td><input type="text" class="editable" value="${teacher.home_nr}" name="home_nr"></td>
+                                    <td><input type="text" class="editable" value="${teacher.flat_nr}" name="flat_nr"></td>
+                                    <td>
+                                        <button class="saveBtn">Zapisz</button>
+                                        <button class="cancelBtn">Anuluj</button>
+                                        <button class="delete-Btn" data-id="${teacher.id}">Usuń</button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        $('#teachersBody').append(`
+                            <tr>
+                                <td colspan="12">Nie znaleziono pracowników.</td>
+                            </tr>
+                        `);
+                    }
+                },
+                error: function() {
+                    alert('Błąd podczas ładowania pracowników');
+                }
+            });
+        }
+
+        function updateTeacher(row) {
+            let teacherId = row.data('id');
+            let teacherData = {};
+
+            row.find('input.editable').each(function() {
+                teacherData[$(this).attr('name')] = $(this).val();
+            });
+
+            $.ajax({
+                url: '{% url "update_teacher_info" %}',
+                method: 'POST',
+                data: JSON.stringify({
+                    'id': teacherId,
+                    'teacherData': teacherData
+                }),
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'  // Wstaw token CSRF
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        alert(response.message);
+                    } else {
+                        alert(response.message);
+                    }
+                    fetchTeachers()
+                },
+                error: function() {
+                    alert('Błąd podczas zapisywania danych');
+                    fetchTeachers()
+                }
+            });
+        }
+        // Zapisanie zmodyfikowanego rekordu
+        $(document).on('click', '.saveBtn', function() {
+            let row = $(this).closest('tr');
+            updateTeacher(row);
+        });
+
+        // Anulowanie edycji (można dodać, jeśli chcesz przywrócić pierwotne wartości pól)
+        $(document).on('click', '.cancelBtn', function() {
+            fetchTeachers();  // Odświeża tabelę do pierwotnego stanu
+        });
+        $(document).on('click', '.delete-Btn', function() {
+            let teacherId = $(this).data('id');
+            if (confirm('Czy na pewno chcesz usunąć tego pracownika?')) {  
+                $.ajax({
+                    url: '{% url "delete_teacher" %}',  
+                    method: 'POST',
+                    data: {
+                        'teacherId': teacherId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(response) {
+                        alert('Pracownik usunięty pomyślnie!');
+                        fetchTeachers();
+                    },
+                    error: function() {
+                        alert('Błąd podczas usuwania pracownika');
+                    }
+                });
+            }
+        });
+
+        // Event listener na przycisk wyszukiwania
+        $('#surnameFilter').on('input', fetchTeachers);  
+        $('#indexFilter').on('input', fetchTeachers); 
+       
+
+
+        // Zmiana porządku sortowania
+        $('#sortOrder').on('change', fetchTeachers); 
+        $(document).ready(function() {
+            fetchTeachers();
+        });
+    </script>
+
+</body>
+</html>

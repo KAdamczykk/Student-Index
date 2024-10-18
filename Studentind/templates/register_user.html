@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarejestruj</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% load form_tags %}
+
+    <style>
+        /* Stylowanie głównego kontenera */
+        html, body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        /* Stylowanie górnego paska (header) */
+        .header {
+            background-color: #b19cd9;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .header .user-info {
+            font-size: 14px;
+        }
+
+        .header .user-info a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Pasek z logo umieszczony pod headerem */
+        .logo-bar {
+            background-color: #4d7be5;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+        .no-underline {
+            text-decoration: none; /* Usunięcie podkreślenia */
+        }
+
+
+
+        /* Nawigacja po lewej stronie */
+        .sidebar {
+            background-color: #add8e6;
+            width: 200px;
+            padding-top: 20px;
+            position: relative;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #87ceeb;
+        }
+
+        .sidebar .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Główna zawartość strony */
+        .content {
+            margin-left: 210px;
+            padding: 20px;
+            padding-top: 20px;
+            top: 100px;
+            position: absolute;
+
+        }
+
+        .content .welcome-box {
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f0f8ff;
+            margin-left: 250px;
+            margin-right: 310px;
+
+        }
+
+        .content .welcome-box h2 {
+            margin-top: 0;
+            background-color: #87ceeb;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .content .welcome-box p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .text-danger {
+    color: red;  /* Kolor błędów */
+    font-size: 0.875em;  /* Zmniejszony rozmiar tekstu */
+    margin-bottom: 5px;  /* Odstęp między błędem a polem formularza */
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px; /* Odstęp między polami formularza */
+}
+
+.error-message {
+    margin-bottom: 5px; /* Odstęp między błędem a polem formularza */
+}
+
+        /* Stylowanie ikony hamburgera */
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .form-container {
+    max-width: 600px; /* Ustaw maksymalną szerokość formularza */
+    margin: 0 auto;   /* Wyrównaj formularz na środku */
+}
+
+.form-group {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px; /* Odstęp między polami */
+}
+
+.form-group label {
+    width: 150px; /* Stała szerokość etykiety */
+    text-align: right;
+    padding-right: 20px; /* Odstęp między etykietą a polem */
+}
+
+.form-group .form-control {
+    flex: 1; /* Pole wypełnia resztę przestrzeni */
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn-submit {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+
+.btn-submit:hover {
+    background-color: #45a049;
+}
+
+
+        /* Dla widoków mobilnych */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 14px;
+            }
+
+            .header .user-info {
+                font-size: 12px;
+            }
+
+            .logo-bar h1 {
+                font-size: 18px;
+            }
+
+   
+                .sidebar {
+                    display: none; /* Domyślnie ukryty */
+                    position: fixed; /* Ustawiony na fixed */
+                    width: 100%;
+                    height: auto; /* Możesz ustawić wysokość, jeśli chcesz */
+                    background-color: #add8e6;
+                    top: 60px; /* Ustawiony tuż pod headerem */
+                    left: 0;
+                    z-index: 1000; /* Upewnij się, że sidebar jest nad innymi elementami */
+                }
+
+                .sidebar.active {
+                    display: block; /* Sidebar widoczny, gdy aktywny */
+                }
+
+            .hamburger {
+                display: block;
+                color: white;
+                margin-right: 10px;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .content .welcome-box {
+                border: 2px solid #333;
+                padding: 20px;
+                border-radius: 10px;
+                background-color: #f0f8ff;
+                margin-left: 50px;
+                margin-right: 50px;
+
+            }
+            .form-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px; /* Odstępy między polami */
+                justify-content: space-between; /* Równe rozłożenie kolumn */
+            }
+
+            /* Każde pole zajmuje 48% szerokości w jednej kolumnie */
+            .form-group {
+                flex: 1 1 48%;
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px; /* Równe odstępy między polami */
+            }
+
+            /* Stylowanie etykiet */
+            label {
+                margin-bottom: 5px;
+                font-weight: bold;
+                width: 100px;
+            }
+
+            /* Stylowanie pól input */
+            .form-control {
+                width: 100%;
+                padding: 8px;
+                font-size: 14px;
+                margin-top: 5px;
+                box-sizing: border-box;
+            }
+
+            /* Przyciski */
+            .btn {
+                padding: 10px 20px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            .btn:hover {
+                background-color: #0056b3;
+            }
+
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Górna sekcja -->
+    <div class="header">
+        <span class="hamburger" onclick="toggleMenu()">&#9776;</span>
+        <h1>STUDENT INDEX</h1>
+        <div class="user-info">
+            UŻYTKOWNIK 
+            
+            {{user.username}} | <a href="/logout">WYLOGUJ</a>
+
+        </div>
+    </div>
+
+    <!-- Pasek z logo -->
+    <a href="{% url 'admin_dashboard' %}" class="no-underline">
+        <div class="logo-bar">
+            <h1>Tu można umieścić logo uczelni</h1>
+        </div>
+        </a>
+
+   <!-- Lewa nawigacja -->
+   <div class="sidebar" id="sidebar">
+        <a href="{% url 'register_user' %}">Dodaj użytkownika</a>
+        <a href="{% url 'admins_view' %}">Dodaj admina</a>
+        <a href="{% url 'user_list' %}">Zmiana hasła</a>
+        <a href="{% url 'students_info' %}">Studenci</a>
+        <a href="{% url 'teachers_info' %}">Pracownicy</a>
+        <a href="{% url 'subjects_info' %}">Przedmioty</a>
+        <a href="{% url 'aplications_info' %}">Podania</a>
+        <a href="{% url 'teacher_oceny' %}">Oceny</a>
+        <a href="{% url 'teacher_sprawdziany' %}">Punkty ze sprawdzianów</a>
+        <a href="{% url 'teacher_obecnosc' %}">Nieobecności studentów</a>
+
+</div>
+
+    <!-- Główna zawartość -->
+    <div class="content">
+        <div class="welcome-box">
+            <h2>Rejestracja Użytkownika</h2>
+            <p>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                
+                    <div class="form-container">
+                        <!-- Pole: Imię -->
+                        <div class="form-group">
+                            <label for="{{ form.Name.id_for_label }}">Imię:</label>
+                            {{ form.Name|add_class:"form-control" }}
+                        </div>
+                
+                        <!-- Pole: Nazwisko -->
+                        <div class="form-group">
+                            <label for="{{ form.surname.id_for_label }}">Nazwisko:</label>
+                            {{ form.surname|add_class:"form-control" }}
+                        </div>
+                        {% if form.index.errors %}
+                        <div class="error-message">
+                            {% for error in form.index.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <!-- Pole: Numer indeksu -->
+                        <div class="form-group">
+                            
+                            <label for="{{ form.index.id_for_label }}">Numer indeksu:</label>
+                            {{ form.index|add_class:"form-control" }}
+                        </div>
+                        {% if form.email.errors %}
+                                <div class="error-message">
+                                    {% for error in form.email.errors %}
+                                        <p class="text-danger">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        <!-- Pole: Email -->
+                        <div class="form-group">
+                            
+                            <label for="{{ form.email.id_for_label }}">Email:</label>
+                            {{ form.email|add_class:"form-control" }}
+                        </div>
+                        {% if form.password1.errors %}
+                        <div class="error-message">
+                            {% for error in form.password1.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                        <!-- Pole: Hasło -->
+                        <div class="form-group">
+
+                            <label for="{{ form.password1.id_for_label }}">Hasło:</label>
+                            {{ form.password1|add_class:"form-control" }}
+                        </div>
+                        {% if form.password2.errors %}
+                        <div class="error-message">
+                            {% for error in form.password2.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                        <!-- Pole: Potwierdzenie hasła -->
+                        <div class="form-group">
+
+                            <label for="{{ form.password2.id_for_label }}">Potwierdzenie hasła:</label>
+                            {{ form.password2|add_class:"form-control" }}
+                        </div>
+                        {% if form.pesel.errors %}
+                        <div class="error-message">
+                            {% for error in form.pesel.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                        <div class="form-group">
+                            <label for="{{ form.pesel.id_for_label }}">PESEL:</label>
+                            {{ form.pesel|add_class:"form-control" }}
+                        </div>
+                        {% if form.phone_number.errors %}
+                        <div class="error-message">
+                            {% for error in form.phone_number.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                        <div class="form-group">
+                            <label for="{{ form.phone_number.id_for_label }}">Numer telefonu:</label>
+                            {{ form.phone_number|add_class:"form-control" }}
+                        </div>
+                
+                        <div class="form-group">
+                            <label for="{{ form.city.id_for_label }}">Miasto:</label>
+                            {{ form.city|add_class:"form-control" }}
+                        </div>
+                
+                        <div class="form-group">
+                            <label for="{{ form.street.id_for_label }}">Ulica:</label>
+                            {{ form.street|add_class:"form-control" }}
+                        </div>
+                
+                        <div class="form-group">
+                            <label for="{{ form.home_nr.id_for_label }}">Numer domu:</label>
+                            {{ form.home_nr|add_class:"form-control" }}
+                        </div>
+                
+                        <div class="form-group">
+                            <label for="{{ form.flat_nr.id_for_label }}">Numer mieszkania:</label>
+                            {{ form.flat_nr|add_class:"form-control" }}
+                        </div>
+                
+                        <div class="form-group">
+                            <label for="{{ form.course.id_for_label }}">Kierunek:</label>
+                            {{ form.course|add_class:"form-control" }}
+                        </div>
+                
+                        <div class="form-group">
+                            <label for="{{ form.year.id_for_label }}">Rok:</label>
+                            {{ form.year|add_class:"form-control" }}
+                        </div>
+                
+                        <div class="form-group">
+                            <label for="{{ form.role.id_for_label }}">Rola:</label>
+                            {{ form.role|add_class:"form-control" }}
+                        </div>
+                
+                        <div class="form-group">
+                            <button type="submit" class="btn-submit">Zarejestruj</button>
+                        </div>
+                    </div>
+                </form>
+                
+                
+                
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
+        }
+    </script>
+
+</body>
+</html>

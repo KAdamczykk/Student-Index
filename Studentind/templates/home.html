@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        /* Stylowanie głównego kontenera */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Stylowanie górnego paska (header) */
+        .header {
+            background-color: #b19cd9;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .header .user-info {
+            font-size: 14px;
+        }
+
+        .header .user-info a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Pasek z logo umieszczony pod headerem */
+        .logo-bar {
+            background-color: #4d7be5;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+        .no-underline {
+            text-decoration: none; /* Usunięcie podkreślenia */
+        }
+
+        /* Nawigacja po lewej stronie */
+        .sidebar {
+            background-color: #add8e6;
+            width: 200px;
+            padding-top: 20px;
+            position: relative;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #87ceeb;
+        }
+
+        .sidebar .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Główna zawartość strony */
+        .content {
+            margin-left: 210px;
+            padding: 20px;
+            padding-top: 20px;
+            top: 100px;
+            position: absolute;
+
+        }
+        .content h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .content .welcome-box {
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f0f8ff;
+            width: 70vw;
+        }
+
+        .content .welcome-box h2 {
+            margin-top: 0;
+            background-color: #87ceeb;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .content .welcome-box p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Stylowanie ikony hamburgera */
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Dla widoków mobilnych */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 14px;
+            }
+
+            .header .user-info {
+                font-size: 12px;
+            }
+
+            .logo-bar h1 {
+                font-size: 18px;
+            }
+
+            .sidebar {
+                    display: none; /* Domyślnie ukryty */
+                    position: fixed; /* Ustawiony na fixed */
+                    width: 100%;
+                    height: auto; 
+                    background-color: #add8e6;
+                    top: 60px; /* Ustawiony tuż pod headerem */
+                    left: 0;
+                    z-index: 1000; 
+                }
+
+            .sidebar.active {
+                display: block;
+            }
+
+            .hamburger {
+                display: block;
+                color: white;
+                margin-right: 10px;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .content .welcome-box {
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f0f8ff;
+            width: 80vw;
+        }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Górna sekcja -->
+    <div class="header">
+        <span class="hamburger" onclick="toggleMenu()">&#9776;</span>
+        <h1>STUDENT INDEX</h1>
+        <div class="user-info">
+            UŻYTKOWNIK 
+            {% if is_authenticated %}
+                {{user.username}} | <a href="/logout">WYLOGUJ</a>
+            {% else %}
+                NIEZALOGOWANY | <a href="/login">ZALOGUJ</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Pasek z logo -->
+    <a href="{% url 'home' %}" class="no-underline">
+        <div class="logo-bar">
+            <h1>Tu można umieścić logo uczelni</h1>
+        </div>
+        </a>
+
+    <!-- Lewa nawigacja -->
+    <div class="sidebar" id="sidebar">
+        {% if user.is_authenticated %}
+            {% if role != 'Student' %}
+            <a href="{% url 'home' %}" class="disabled">- STUDENT</a>
+            <a href="{% url 'home' %}">- PRACOWNIK</a>
+            <div class="sub-section">
+                <a href="{% url 'teacher_oceny' %}">Oceny</a>
+                <a href="{% url 'teacher_sprawdziany' %}">Punkty ze sprawdzianów</a>
+                <a href="{% url 'teacher_obecnosc' %}">Nieobecności studentów</a>
+            </div>
+            {% elif role != 'Teacher' %}
+            <a href="{% url 'home' %}">- STUDENT</a>
+                <div class="sub-section">
+                    <a href="{% url 'oceny' %}">Oceny</a>
+                    <a href="{% url 'sprawdziany' %}">Sprawdziany</a>
+                    <a href="{% url 'podania' %}">Podania</a>
+                    <a href="{% url 'obecnosc' %}">Obecność</a>
+                </div>
+                <a href="{% url 'home' %}" class="disabled">- PRACOWNIK</a>
+            {% endif %}
+        {% else %}
+        <a href="{% url 'home' %}" class="disabled">- STUDENT</a>
+        <a href="{% url 'home' %}" class="disabled">- PRACOWNIK</a>
+        {% endif %}
+        </div>
+
+    <!-- Główna zawartość -->
+    <div class="content">
+        <div class="welcome-box">
+            {% if user.role == 'Student' %}
+                <h2>WITAJ STUDENCIE</h2>
+                <p>
+                    Jako zalogowany użytkownik możesz korzystać w pełni z uprawnień Studenckich na tej platformie. Możesz sprawdzić swoje wyniki ze sprawdzianów i oceny. Masz możliwość również śledzenia swoich nieobecności, czy składania podań. Miłego studiowania :))
+                </p>
+            {% elif user.role == 'Teacher' %}
+                <h2>WITAJ PRACOWNIKU</h2>
+                <p>
+                    Jako zalogowany użytkownik możesz korzystać w pełni z uprawnień Pracowniczych na tej platformie. Możesz modyfikować i dodawać oceny czy też wyniki studentów ze sprawdzianów. Masz możliwość również wpisywania studentom nieobecności podczas zajęć oraz składania podań. Miłej pracy :))
+                </p>
+            {% else %}
+                <h2>WITAJ</h2>
+                <p>
+                    Witaj w panelu. Wybierz swoją rolę, aby kontynuować.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Management</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        /* Stylowanie głównego kontenera */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #b19cd9;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header .user-info {
+            font-size: 14px;
+        }
+
+        .header .user-info a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Pasek z logo umieszczony pod headerem */
+        .logo-bar {
+            background-color: #4d7be5;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+        .no-underline {
+            text-decoration: none; /* Usunięcie podkreślenia */
+        }
+
+        .sidebar {
+            background-color: #add8e6;
+            width: 200px;
+            padding-top: 20px;
+            position: relative;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #87ceeb;
+        }
+        .content {
+            margin-left: 210px;
+            padding: 20px;
+            padding-top: 20px;
+            top: 100px;
+            position: absolute;
+
+        }
+        .content h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+
+        /* Stylowanie ikony hamburgera */
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 70vw;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .form-control{
+            width: 90%;
+            
+        }
+        .formsik{
+            width: 70vw;
+            border-radius: 5px;
+            margin-bottom: 20px;
+
+        }
+        .f-label{
+            margin-top: 20px;
+        }
+        .modalbtn{
+            display: inline-block;
+            padding: 10px 15px;
+            border: none;
+            text-decoration: none;
+            background-color: #4d7be5; 
+            color: white; 
+            border-radius: 5px; 
+            margin-top: 20px; 
+        }
+        .save-btn{
+            display: inline-block;
+            padding: 10px px;
+            border: none;
+            text-decoration: none;
+            background-color: #06bd21e8; 
+            color: white; 
+            border-radius: 5px; 
+            width: 60px;
+        }
+        .delete-btn{
+            display: inline-block;
+            padding: 10px px;
+            border: none;
+            text-decoration: none;
+            background-color: #e13409e8; 
+            color: white; 
+            border-radius: 5px; 
+            width: 60px;
+        }
+        /* Dla widoków mobilnych */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 14px;
+            }
+
+            .header .user-info {
+                font-size: 12px;
+            }
+
+            .logo-bar h1 {
+                font-size: 18px;
+            }
+
+            .sidebar {
+                    display: none; /* Domyślnie ukryty */
+                    position: fixed; /* Ustawiony na fixed */
+                    width: 100%;
+                    height: auto; /* Możesz ustawić wysokość, jeśli chcesz */
+                    background-color: #add8e6;
+                    top: 60px; /* Ustawiony tuż pod headerem */
+                    left: 0;
+                    z-index: 1000; /* Upewnij się, że sidebar jest nad innymi elementami */
+                }
+
+            .sidebar.active {
+                display: block;
+            }
+
+            .hamburger {
+                display: block;
+                color: white;
+                margin-right: 10px;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .formsik{
+            width: 80vw;
+            border-radius: 5px;
+            margin-bottom: 20px}
+            table {
+            width: 80vw;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+            
+
+
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Górna sekcja -->
+    <div class="header">
+        <span class="hamburger" onclick="toggleMenu()">&#9776;</span>
+
+        <h1>STUDENT INDEX</h1>
+        <div class="user-info">
+            UŻYTKOWNIK {{user.username}} | <a href="/logout">WYLOGUJ</a>
+        </div>
+    </div>
+
+    <!-- Pasek z logo -->
+    <a href="{% url 'admin_dashboard' %}">
+        <div class="logo-bar">
+            <h1>Tu można umieścić logo uczelni</h1>
+        </div>
+        </a>
+
+    <!-- Lewa nawigacja -->
+    <div class="sidebar" id="sidebar">
+        <a href="{% url 'register_user' %}">Dodaj użytkownika</a>
+        <a href="{% url 'admins_view' %}">Dodaj admina</a>
+        <a href="{% url 'user_list' %}">Zmiana hasła</a>
+        <a href="{% url 'students_info' %}">Studenci</a>
+        <a href="{% url 'teachers_info' %}">Pracownicy</a>
+        <a href="{% url 'subjects_info' %}">Przedmioty</a>
+        <a href="{% url 'aplications_info' %}">Podania</a>
+        <a href="{% url 'teacher_oceny' %}">Oceny</a>
+        <a href="{% url 'teacher_sprawdziany' %}">Punkty ze sprawdzianów</a>
+        <a href="{% url 'teacher_obecnosc' %}">Nieobecności studentów</a>
+    </div>
+
+    <!-- Główna zawartość -->
+    <div class="content">
+        <h1>Administratorzy</h1>
+
+    <!-- Pole filtrowania po nazwie użytkownika -->
+        <div>
+            <label for="filterUsername" class="f-label">Filtruj po nazwie użytkownika:</label>
+            <input type="text" id="filterUsername" class="formsik" placeholder="Wpisz nazwę użytkownika...">
+        </div>
+        <!-- Modal do dodania nowego admina -->
+        <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addAdminModalLabel">Dodaj Nowego Administratora</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{% url 'add_admin' %}">
+                        {% csrf_token %}
+                        <div class="modal-body">
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Hasło</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password2" class="form-label">Powtórz Hasło</label>
+                                <input type="password" class="form-control" id="password2" name="password2" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                            <button type="submit" class="btn btn-primary">Dodaj Admina</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <!-- Tabela z adminami -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody id="adminTableBody">
+            {% for admin in admins %}
+            <tr data-id="{{ admin.id }}">
+                <td>{{ admin.id }}</td>
+                <td>
+                    <input type="text" class="form-control editable-username" value="{{ admin.username }}" data-id="{{ admin.id }}">
+                </td>
+                <td>
+                    <input type="email" class="form-control editable-email" value="{{ admin.email }}" data-id="{{ admin.id }}">
+                </td>
+                <td>
+                    <button class="save-btn" data-id="{{ admin.id }}">Zapisz</button>
+                    <button class="delete-btn" data-id="{{ admin.id }}">Usuń</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Przycisk dodania administratora -->
+    <button class="modalbtn" data-bs-toggle="modal" data-bs-target="#addAdminModal">Dodaj Administratora</button>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
+        }
+        // Usuwanie administratora za pomocą AJAX
+        $(document).on('click', '.delete-btn', function() {
+            var adminId = $(this).data('id');
+            if (confirm('Czy na pewno chcesz usunąć tego administratora?')) {
+                $.ajax({
+                    url: '/delete_admin/' + adminId + '/',
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            alert(response.message);
+                            $('tr[data-id="' + adminId + '"]').remove();  // Usuń wiersz z tabeli
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Wystąpił błąd podczas usuwania administratora.');
+                    }
+                });
+            }
+        });
+
+        // Zapisz zmiany dla pola username i email
+        $(document).on('click', '.save-btn', function() {
+            var adminId = $(this).data('id');
+            var newUsername = $('input.editable-username[data-id="' + adminId + '"]').val();
+            var newEmail = $('input.editable-email[data-id="' + adminId + '"]').val();
+
+            $.ajax({
+                url: '/change_values_admin/' + adminId + '/',
+                method: 'POST',
+                data: {
+                    'username': newUsername,
+                    'email': newEmail
+                },
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        alert(response.message);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Wystąpił błąd podczas zapisywania zmian.');
+                }
+            });
+        });
+        $('#addAdminModal form').on('submit', function(e) {
+        e.preventDefault(); // Zatrzymaj domyślne przesyłanie formularza
+        var formData = $(this).serialize(); // Serializuj dane formularza
+
+        $.ajax({
+            url: $(this).attr('action'), // Użyj akcji formularza
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    alert('Administrator został dodany pomyślnie.');
+                    // Możesz tutaj dodać kod do odświeżenia tabeli lub zamknięcia modalu
+                    $('#addAdminModal').modal('hide'); // Ukryj modal
+                    // Tutaj możesz dodać logikę, aby odświeżyć tabelę administratorów
+                    
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr) {
+                alert('Wystąpił błąd: ' + xhr.responseText);
+            }
+        });
+    });
+
+        // Filtrowanie administratorów po nazwie użytkownika (AJAX)
+        $('#filterUsername').on('input', function() {
+            var filterValue = $(this).val().toLowerCase();
+            $('#adminTableBody tr').filter(function() {
+                $(this).toggle($(this).find('input.editable-username').val().toLowerCase().indexOf(filterValue) > -1);
+            });
+        });
+    </script>
+    </div>
+</body>
+</html>

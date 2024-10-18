@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Tests</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        /* Stylowanie głównego kontenera */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Stylowanie górnego paska (header) */
+        .header {
+            background-color: #b19cd9;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .header .user-info {
+            font-size: 14px;
+        }
+
+        .header .user-info a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Pasek z logo umieszczony pod headerem */
+        .logo-bar {
+            background-color: #4d7be5;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+        .no-underline {
+            text-decoration: none; /* Usunięcie podkreślenia */
+        }
+
+        /* Nawigacja po lewej stronie */
+        .sidebar {
+            background-color: #add8e6;
+            width: 200px;
+            padding-top: 20px;
+            position: relative;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #87ceeb;
+        }
+
+        .sidebar .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Główna zawartość strony */
+        .content {
+            margin-left: 210px;
+            padding: 20px;
+            padding-top: 20px;
+            top: 100px;
+            position: absolute;
+
+        }
+        .content h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+
+        .test-details {
+            display: none; /* Ukryte domyślnie */
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #555;
+            
+        }
+
+        .test-row {
+            cursor: pointer;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            width: 70vw;
+        }
+
+        .test-row:hover {
+            background-color: #e9e9e9;
+        }
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .filters{
+            width: 200px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+   
+
+        /* Dla widoków mobilnych */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 14px;
+            }
+
+            .header .user-info {
+                font-size: 12px;
+            }
+
+            .logo-bar h1 {
+                font-size: 18px;
+            }
+
+            .sidebar {
+                    display: none; /* Domyślnie ukryty */
+                    position: fixed; /* Ustawiony na fixed */
+                    width: 100%;
+                    height: auto; /* Możesz ustawić wysokość, jeśli chcesz */
+                    background-color: #add8e6;
+                    top: 60px; /* Ustawiony tuż pod headerem */
+                    left: 0;
+                    z-index: 1000; /* Upewnij się, że sidebar jest nad innymi elementami */
+                }
+
+            .sidebar.active {
+                display: block;
+            }
+
+            .hamburger {
+                display: block;
+                color: white;
+                margin-right: 10px;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+    <script>
+        // Funkcja do rozwijania i zwijania dodatkowych informacji
+        function toggleDetails(testId) {
+            const details = document.getElementById("details-" + testId);
+            
+            // Sprawdzanie, czy element istnieje i ukrywanie/wyświetlanie na podstawie klasy, nie stanu stylu
+            if (details) {
+                if (details.classList.contains('hidden')) {
+                    details.classList.remove('hidden');
+                    details.style.display = "block";
+                } else {
+                    details.classList.add('hidden');
+                    details.style.display = "none";
+                }
+            }
+        }
+
+        // Automatycznie dodawanie klasy 'hidden' dla początkowego stanu ukrycia
+        window.onload = function() {
+            const detailsElements = document.querySelectorAll('.test-details');
+            detailsElements.forEach(element => {
+                element.classList.add('hidden');
+            });
+        };
+    </script>
+</head>
+<body>
+
+    <!-- Górna sekcja -->
+    <div class="header">
+        <span class="hamburger" onclick="toggleMenu()">&#9776;</span>
+        <h1>STUDENT INDEX</h1>
+        <div class="user-info">
+            UŻYTKOWNIK 
+            
+            {{user.username}} | <a href="/logout">WYLOGUJ</a>
+
+        </div>
+    </div>
+
+    <!-- Pasek z logo -->
+    <a href="{% url 'home' %}" class="no-underline">
+        <div class="logo-bar">
+            <h1>Tu można umieścić logo uczelni</h1>
+        </div>
+        </a>
+
+    <!-- Lewa nawigacja -->
+    <div class="sidebar" id="sidebar">
+        <a href="{% url 'home' %}">- STUDENT</a>
+        <div class="sub-section">
+            <a href="{% url 'oceny' %}">Oceny</a>
+            <a href="{% url 'sprawdziany' %}">Sprawdziany</a>
+            <a href="{% url 'podania' %}">Podania</a>
+            <a href="{% url 'obecnosc' %}">Obecność</a>
+        </div>
+        <a href="{% url 'home' %}" class="disabled">- PRACOWNIK</a>
+    </div>
+
+    <!-- Główna zawartość -->
+    <div class="content">
+        <h1>Lista sprawdzianów</h1>
+        <input type="text" id="filter" class="filters" placeholder="Szukaj po przedmiocie..." />
+
+        <div id="testsContainer">
+            {% for test in tests %}
+            <div class="test-row" onclick="toggleDetails('{{ forloop.counter }}')">
+                <strong>{{ test.subject }}</strong> - Test nr: {{ test.test_nr }} - Ilość punktów: {{ test.points }}
+            </div>
+            <div id="details-{{ forloop.counter }}" class="test-details hidden">
+                Max ilość punktów: {{ test.max_points }}
+            </div>
+            {% empty %}
+            <p>Brak dostępnych sprawdzianów.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
+        }
+
+        $(document).ready(function() {
+            // Filtrowanie danych
+            function filterData() {
+                let searchTerm = $('#filter').val().toLowerCase(); // Użycie toLowerCase dla porównania
+
+                $('#testsContainer .test-row').each(function() {
+                    // Ukrycie każdego wiersza
+                    $(this).hide();
+                    // Sprawdzenie, czy tekst w wierszu zawiera termin wyszukiwania
+                    if ($(this).text().toLowerCase().includes(searchTerm)) {
+                        $(this).show(); // Pokaż wiersz, jeśli pasuje
+                    } 
+                });
+
+               
+            }
+
+            // Eventy do wyzwalania filtrowania
+            $('#filter').on('input', filterData);
+
+            // Na dzień dobry, ładujemy wszystkie oceny
+            filterData();
+        });
+    </script>
+</body>
+</html>

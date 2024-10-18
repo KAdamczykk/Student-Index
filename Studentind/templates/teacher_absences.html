@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Absences</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        /* Stylowanie głównego kontenera */
+                /* Stylowanie głównego kontenera */
+                body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .modal {
+    display: none; /* Ukryty, gdy nieaktywowany */
+    position: fixed;
+    z-index: 1050; /* Wyższy z-index, aby modal był na wierzchu */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.5); /* Tło za modalem */
+}
+
+/* Styl dla okna modala */
+.modal-content {
+    background-color: #fff; /* Jasne tło */
+    margin: 5% auto; /* Wyśrodkowanie okna */
+    padding: 20px; /* Wewnętrzne odstępy */
+    border-radius: 5px; /* Zaokrąglenie rogów */
+    width: 50%; /* Szerokość modala */
+    max-width: 600px; /* Maksymalna szerokość */
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5); /* Cień wokół okna */
+}
+
+/* Stylowanie nagłówka, przycisku zamknięcia */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 10px;
+}
+
+.close {
+    color: #aaa;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: black;
+}
+/* Styl dla formularza wewnątrz modala */
+.modal-body {
+    padding-top: 20px;
+}
+
+.modal-body label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.modal-body input,
+.modal-body select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+/* Przycisk zapisu */
+#saveAbsenceBtn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff; /* Bootstrapowy niebieski */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#saveAbsenceBtn:hover {
+    background-color: #0056b3;
+}
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Stylowanie górnego paska (header) */
+        .header {
+            background-color: #b19cd9;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header .user-info {
+            font-size: 14px;
+        }
+
+        .header .user-info a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .student-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .student-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Pasek z logo umieszczony pod headerem */
+        .logo-bar {
+            background-color: #4d7be5;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+        .no-underline {
+            text-decoration: none; /* Usunięcie podkreślenia */
+        }
+
+        /* Nawigacja po lewej stronie */
+        .sidebar {
+            background-color: #add8e6;
+            width: 200px;
+            padding-top: 20px;
+            position: relative;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #87ceeb;
+        }
+
+        .sidebar .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Główna zawartość strony */
+        .content {
+            margin-left: 210px;
+            padding: 20px;
+            padding-top: 20px;
+            top: 100px;
+            position: absolute;
+
+        }
+        .content h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+       
+
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .saveBtn{
+            display: inline-block;
+            padding: 10px px;
+            border: none;
+            text-decoration: none;
+            background-color: #06bd21e8; 
+            color: white; 
+            border-radius: 5px; 
+            width: 60px;
+        }
+        .absenceInput{
+            width: 30px;
+            border-radius: 5px;
+        }
+        .addAbsenceBtn{
+            display: inline-block;
+            padding: 10px 15px;
+            border: none;
+            text-decoration: none;
+            background-color: #4d7be5; 
+            color: white; 
+            border-radius: 5px; 
+            margin-top: 15px; 
+            margin-bottom: 15px;
+        }
+        
+
+        /* Dla widoków mobilnych */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 14px;
+            }
+
+            .header .user-info {
+                font-size: 12px;
+            }
+
+            .logo-bar h1 {
+                font-size: 18px;
+            }
+
+            .sidebar {
+                    display: none; /* Domyślnie ukryty */
+                    position: fixed; /* Ustawiony na fixed */
+                    width: 100%;
+                    height: auto; /* Możesz ustawić wysokość, jeśli chcesz */
+                    background-color: #add8e6;
+                    top: 60px; /* Ustawiony tuż pod headerem */
+                    left: 0;
+                    z-index: 1000; /* Upewnij się, że sidebar jest nad innymi elementami */
+                }
+
+            .sidebar.active {
+                display: block;
+            }
+
+            .hamburger {
+                display: block;
+                color: white;
+                margin-right: 10px;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Górna sekcja -->
+    <div class="header">
+        <span class="hamburger" onclick="toggleMenu()">&#9776;</span>
+        <h1>STUDENT INDEX</h1>
+        <div class="user-info">
+            UŻYTKOWNIK 
+            
+            {{user.username}} | <a href="/logout">WYLOGUJ</a>
+
+        </div>
+    </div>
+
+    <!-- Pasek z logo -->
+    {% if user.is_superuser %}
+    <a href="{% url 'admin_dashboard' %}">
+        <div class="logo-bar">
+            <h1>Tu można umieścić logo uczelni</h1>
+        </div>
+        </a>
+    {% else %}
+    <a href="{% url 'home' %}">
+        <div class="logo-bar">
+            <h1>Tu można umieścić logo uczelni</h1>
+        </div>
+        </a>
+    {% endif %}
+
+   <!-- Lewa nawigacja -->
+   <div class="sidebar" id="sidebar">
+    {% if user.is_superuser %}
+        <a href="{% url 'register_user' %}">Dodaj użytkownika</a>
+        <a href="{% url 'admins_view' %}">Dodaj admina</a>
+        <a href="{% url 'user_list' %}">Zmiana hasła</a>
+        <a href="{% url 'students_info' %}">Studenci</a>
+        <a href="{% url 'teachers_info' %}">Pracownicy</a>
+        <a href="{% url 'subjects_info' %}">Przedmioty</a>
+        <a href="{% url 'aplications_info' %}">Podania</a>
+        <a href="{% url 'teacher_oceny' %}">Oceny</a>
+        <a href="{% url 'teacher_sprawdziany' %}">Punkty ze sprawdzianów</a>
+        <a href="{% url 'teacher_obecnosc' %}">Nieobecności studentów</a>
+    {% else %}
+        <a href="{% url 'home' %}" class="disabled">- STUDENT</a>
+        <a href="{% url 'home' %}">- PRACOWNIK</a>
+        <div class="sub-section">
+            <a href="{% url 'teacher_oceny' %}">Oceny</a>
+            <a href="{% url 'teacher_sprawdziany' %}">Punkty ze sprawdzianów</a>
+            <a href="{% url 'teacher_obecnosc' %}">Nieobecności studentów</a>
+        </div>
+    {% endif %}
+</div>
+
+    <!-- Główna zawartość -->
+    <div class="content">
+        <h1>Teacher Absences View</h1>
+
+        <!-- Przycisk dodawania nieobecności -->
+        <button id="addAbsenceBtn" class="addAbsenceBtn">Dodaj nieobecność</button>
+        <div>
+            <label for="surnameFilter">Szuakj po nazwisku:</label>
+            <input type="text" id="surnameFilter" class="filters" placeholder="Search by surname..." />
+    
+            <label for="indexFilter">Szukaj po indexie:</label>
+            <input type="text" id="indexFilter" class="filters" placeholder="Search by student index..." />
+        </div>
+    
+        <!-- Modal do dodawania nieobecności -->
+<div id="addAbsencesModal" class="modal">
+    <div class="modal-content">
+        <!-- Nagłówek z przyciskiem zamknięcia -->
+        <div class="modal-header">
+            <h5 class="modal-title">Dodaj Nieobecność</h5>
+            <span class="close">&times;</span>
+        </div>
+
+        <!-- Część główna modala -->
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="studentSearch">Wyszukaj studenta:</label>
+                <input type="text" class="form-control" id="studentSearch" placeholder="Wpisz nazwisko studenta..." />
+                <div id="studentResults"></div> <!-- Wyniki wyszukiwania studentów -->
+            </div>
+
+            <div class="form-group">
+                <label for="subjectSelect">Wybierz przedmiot:</label>
+                <select class="form-control" id="subjectSelect">
+                    <option value="">-- Wybierz przedmiot --</option>
+                    <!-- Dynamicznie wstawiane przedmioty -->
+                </select>
+            </div>
+
+            <button id="saveAbsenceBtn" class="btn btn-primary">Zapisz nieobecność</button>
+        </div>
+    </div>
+</div>
+        <table id="absencesTable" border="1">
+            <thead>
+                <tr>
+                    <th>Imię Studenta</th>
+                    <th>Nazwisko Studenta</th>
+                    <th>Student Index</th>
+                    <th>Przedmiot</th>
+                    <th>Liczba nieobecności</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+                
+            <tbody id="absencesBody">
+                <!-- Dane będą dynamicznie wstawiane przez AJAX -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
+        }
+        function loadAbsences() {
+            let surnameFilter = $('#surnameFilter').val();  // Filtrowanie po nazwisku
+            let indexFilter = $('#indexFilter').val(); 
+            $.ajax({
+                url: '{% url "teacher_filter_absences" %}',
+                data: {
+                    'surname_filter': surnameFilter,
+                    'index_filter': indexFilter,
+                },
+                success: function(data) {
+                    $('#absencesBody').empty();
+
+                    if (data.length > 0) {
+                        $.each(data, function(index, absence) {
+                            $('#absencesBody').append(`
+                                <tr>
+                                    <td>${absence.student_name}</td>
+                                    <td>${absence.student_surname}</td>
+                                    <td>${absence.student_index}</td>
+                                    <td>${absence.subject}</td>
+                                    <td>
+                                        <input type="text" value="${absence.count}" class="absenceInput" data-id="${absence.id}">
+                                    </td>
+                                    <td>
+                                        <button class="saveBtn" data-id="${absence.id}">Zapisz</button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        $('#absencesBody').append(`
+                            <tr>
+                                <td colspan="6">Nie znaleziono nieobecności.</td>
+                            </tr>
+                        `);
+                    }
+                },
+                error: function() {
+                    alert('Błąd podczas ładowania nieobecności');
+                }
+            });
+        }
+        $('#surnameFilter').on('input', loadAbsences);  
+        $('#indexFilter').on('input', loadAbsences);  
+        
+        // Funkcja do wyszukiwania studentów
+        function searchStudents(query) {
+            if (query.length > 0) {
+                $.ajax({
+                    url: '{% url "search_students" %}', // Adres URL do wyszukiwania studentów
+                    data: { 'query': query },
+                    success: function(data) {
+                        $('#studentResults').empty();
+
+                        if (data.length > 0) {
+                            $('#studentResults').show();
+                            $.each(data, function(index, student) {
+                                $('#studentResults').append(`
+                                    <div class="student-item" data-index="${student.studentIndex}" data-name="${student.name}" data-surname="${student.surname}">
+                                        ${student.name} ${student.surname} (${student.studentIndex})
+                                    </div>
+                                `);
+                            });
+                        } else {
+                            $('#studentResults').hide();
+                        }
+                    },
+                    error: function() {
+                        alert('Błąd podczas wyszukiwania studentów');
+                    }
+                });
+            } else {
+                $('#studentResults').hide();
+            }
+        }
+
+        // Eventy do wywoływania filtrowania
+        $(document).on('input', '#studentSearch', function() {
+            searchStudents($(this).val());
+        });
+
+        // Wybór studenta z wyników
+        $(document).on('click', '.student-item', function() {
+            const studentIndex = $(this).data('index');
+            const studentName = $(this).data('name');
+            const studentSurname = $(this).data('surname');
+
+            $('#studentSearch').val(`${studentName} ${studentSurname} (${studentIndex})`);
+            $('#studentResults').hide();
+            loadSubjectsForTeacher(); // Wczytaj przedmioty dla nauczyciela
+        });
+
+        // Funkcja do wczytywania przedmiotów
+        function loadSubjectsForTeacher() {
+            $.ajax({
+                url: '{% url "get_subjects_for_teacher" %}', // Adres URL do wczytywania przedmiotów
+                success: function(data) {
+                    $('#subjectSelect').empty();
+                    $('#subjectSelect').append('<option value="">-- Wybierz przedmiot --</option>');
+
+                    $.each(data, function(index, subject) {
+                        $('#subjectSelect').append(`
+                            <option value="${subject.id}" data-ects="${subject.ects}">${subject.subjectName}</option>
+                        `);
+                    });
+                },
+                error: function() {
+                    alert('Błąd podczas ładowania przedmiotów');
+                }
+            });
+        }
+
+        $(document).on('click', '#saveAbsenceBtn', function() {
+            const studentDetails = $('#studentSearch').val().match(/(.*)\s\((.*)\)/);
+            if (!studentDetails) {
+                alert('Wybierz studenta!');
+                return;
+            }
+            const studentIndex = studentDetails[2];
+            const subjectId = $('#subjectSelect').val();
+
+            $.ajax({
+                url: '{% url "add_absence" %}',
+                method: 'POST',
+                data: {
+                    'student_index': studentIndex,
+                    'subject_id': subjectId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: function(response) {
+                    alert('Nieobecność dodana pomyślnie!');
+                    $('#addAbsencesModal').hide();  // Zamknij modal
+                    loadAbsences();  // Ponownie załaduj oceny
+                },
+                error: function() {
+                    alert('Błąd podczas dodawania nieobecności');
+                }
+            });
+        });
+
+        $(document).on('click', '.saveBtn', function() {
+            let absenceId = $(this).data('id');
+            let count = $(this).closest('tr').find('.absenceInput').val();
+
+            $.ajax({
+                url: '{% url "teacher_update_absences" %}',  // Adres URL do aktualizacji oceny
+                method: 'POST',
+                data: {
+                    'absence_id': absenceId,
+                    'count': count,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',  // Token CSRF do zabezpieczenia
+                },
+                success: function(response) {
+                    alert('absence updated successfully!');
+                    loadAbsences();  
+                },
+                error: function() {
+                    alert('Error updating absences');
+                    loadAbsences();
+                }
+            });
+        });
+        // Wyświetlanie modalu
+        var modal = document.getElementById("addAbsencesModal");
+        var btn = document.getElementById("addAbsenceBtn");
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Ładowanie ocen po załadowaniu strony
+        $(document).ready(function() {
+            loadAbsences();
+        });
+    </script>
+
+</body>
+</html>
